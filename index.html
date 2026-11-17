@@ -4,668 +4,508 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#071426">
 <title>Иш вақтим</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#071426;color:#edf4ff;font-family:Arial,sans-serif}
-header{padding:22px 18px;background:#0d2039;border-bottom:1px solid #203854}
-header h1{margin:0;font-size:25px;color:#8bbcff}
-header p{margin:7px 0 0;color:#9db2ca;font-size:13px}
-main{max-width:650px;margin:auto;padding:16px}
-.card{background:#10243e;border:1px solid #25415f;border-radius:17px;padding:17px;margin-bottom:15px}
-h2{font-size:19px;margin:0 0 15px}
-h3{font-size:16px;color:#a9caff}
-input,button{width:100%;padding:13px;border-radius:10px;font-size:15px}
-input{background:#091a2e;color:white;border:1px solid #34516f;margin:6px 0 13px}
-button{border:0;background:#2676d2;color:white;font-weight:bold;margin:6px 0;cursor:pointer}
-button.secondary{background:#1b3552}
-button.green{background:#167b69}
-button:active{opacity:.8}
-label{font-size:13px;color:#b7c9df}
-.hidden{display:none!important}
-.info{color:#a8bdd5;font-size:13px}
-.stat{background:#0a1b30;border-radius:12px;padding:13px;margin:5px 0}
-.stat small{display:block;color:#9eb4ce;margin-bottom:7px}
-.stat strong{font-size:23px;color:#8bbcff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}
-nav button{margin:0}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:10px 5px;text-align:center;border-bottom:1px solid #29415d}
-th{color:#9fc5f5}
-td{color:#e0eafa}
-.scroll{overflow-x:auto}
-.month-title{font-size:23px;color:#8bbcff;margin:8px 0}
-footer{text-align:center;color:#7189a5;font-size:11px;padding:20px}
+:root {
+  --bg:#07111f;
+  --panel:#101f33;
+  --panel2:#172a43;
+  --blue:#3185f5;
+  --green:#18bd88;
+  --text:#f2f6fc;
+  --muted:#9aacc2;
+  --border:#263b55;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
+header {
+  padding:22px 18px;
+  background:linear-gradient(135deg,#102b4c,#07111f);
+  border-bottom:1px solid var(--border);
+}
+header h1 {margin:0;font-size:25px}
+header p {color:var(--muted);margin:7px 0 0}
+main {max-width:950px;margin:auto;padding:16px}
+nav {
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+button {
+  border:0;border-radius:10px;padding:12px 15px;
+  color:white;background:var(--blue);
+  font-size:14px;font-weight:bold;cursor:pointer;
+}
+button:active {opacity:.75}
+nav button {background:var(--panel2)}
+nav button.active {background:var(--blue)}
+.green {background:var(--green)}
+.red {background:#c34455}
+.secondary {background:#33465e}
+.view {display:none}
+.view.active {display:block}
+.card {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:17px;
+  margin-bottom:15px;
+}
+h2 {font-size:19px;margin:0 0 15px}
+h3 {font-size:16px;margin:0 0 12px}
+label {
+  display:block;color:var(--muted);
+  font-size:13px;margin:12px 0 6px;
+}
+input {
+  width:100%;padding:12px;
+  background:#091727;color:white;
+  border:1px solid var(--border);
+  border-radius:9px;font-size:16px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.stats {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.stat {
+  background:var(--panel2);
+  padding:14px;border-radius:12px;
+}
+.stat small {color:var(--muted);display:block;margin-bottom:7px}
+.stat strong {font-size:21px}
+.muted {color:var(--muted);font-size:13px}
+.actions {display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+table {
+  width:100%;border-collapse:collapse;
+  font-size:13px;min-width:570px;
+}
+th,td {
+  padding:11px 8px;text-align:left;
+  border-bottom:1px solid var(--border);
+}
+th {color:#9db9dc}
+.table-wrap {overflow-x:auto}
+canvas {width:100%;height:250px}
+.profile-line {line-height:1.8;color:var(--muted)}
+.profile-line b {color:white}
+.hidden {display:none!important}
+@media(max-width:520px) {
+  .grid,.stats {grid-template-columns:1fr 1fr}
+  header h1 {font-size:22px}
+  nav button {flex:1 1 40%;padding:11px 5px}
+  .stat strong {font-size:18px}
+}
 </style>
 </head>
-<body>
 
+<body>
 <header>
-<h1>Иш вақтим</h1>
-<p>Шахсий иш вақти назорати</p>
+  <h1>◈ Иш вақтим</h1>
+  <p>Иш соатлари назорати ва ҳисоботи</p>
 </header>
 
 <main>
 
-<section id="profileScreen" class="card hidden">
-<h2>Ходим профили</h2>
-<label>Ф.И.Ш.</label>
-<input id="fullName" placeholder="Фамилия исм шариф">
-<label>Табел рақами</label>
-<input id="tabNumber" placeholder="Табел рақами">
-<label>Лавозими</label>
-<input id="position" placeholder="Лавозимингиз">
-<label>Разряди</label>
-<input id="grade" placeholder="Масалан: 4-разряд">
-<button id="saveProfile">Профилни сақлаш</button>
+<section id="profileView" class="view active">
+  <div class="card">
+    <h2>Ходим профили</h2>
+    <label>Ф.И.Ш.</label>
+    <input id="fullName" placeholder="Фамилия исм шариф">
+    <label>Табел рақами</label>
+    <input id="tabNumber" placeholder="Табел рақами">
+    <label>Лавозими</label>
+    <input id="position" placeholder="Лавозимингиз">
+    <label>Разряди</label>
+    <input id="grade" placeholder="Масалан: 4-разряд">
+    <div class="actions">
+      <button class="green" onclick="saveProfile()">Профилни сақлаш</button>
+    </div>
+  </div>
 </section>
 
 <section id="dashboard" class="hidden">
+  <div class="card">
+    <h2>Ходим маълумотлари</h2>
+    <div id="profileInfo" class="profile-line"></div>
+    <div class="actions">
+      <button class="secondary" onclick="editProfile()">Профилни таҳрирлаш</button>
+    </div>
+  </div>
 
-<div class="card">
-<h2 id="displayName"></h2>
-<p id="displayPosition" class="info"></p>
-<p id="displayTab" class="info"></p>
-<p id="displayGrade" class="info"></p>
-<button class="secondary" id="editProfile">Профилни таҳрирлаш</button>
-</div>
+  <nav>
+    <button class="active" data-view="dayView" onclick="showView('dayView',this)">Кунлик</button>
+    <button data-view="monthView" onclick="showView('monthView',this)">Ойлик</button>
+    <button data-view="yearView" onclick="showView('yearView',this)">Йиллик</button>
+  </nav>
 
-<nav>
-<button id="dailyTab">Кунлик ҳисоб</button>
-<button id="monthlyTab">Ойлик ҳисобот</button>
-</nav>
+  <section id="dayView" class="view active">
+    <div class="card">
+      <h2>Кунлик иш вақти</h2>
+      <label>Сана</label>
+      <input type="date" id="workDate" onchange="loadDay()">
 
-<section id="dailySection">
+      <div class="grid">
+        <div>
+          <label>Асосий иш бошланиши</label>
+          <input type="time" id="mainStart" value="08:00" oninput="calculateDay()">
+        </div>
+        <div>
+          <label>Асосий иш тугаши</label>
+          <input type="time" id="mainEnd" value="17:00" oninput="calculateDay()">
+        </div>
+        <div>
+          <label>Қўшимча иш бошланиши</label>
+          <input type="time" id="extraStart" oninput="calculateDay()">
+        </div>
+        <div>
+          <label>Қўшимча иш тугаши</label>
+          <input type="time" id="extraEnd" oninput="calculateDay()">
+        </div>
+      </div>
+      <p class="muted">Тушлик вақти 12:00–13:00 асосий иш вақтидан автоматик чиқарилади.</p>
+    </div>
 
-<div class="card">
-<h2>Кунлик иш вақти</h2>
-<label>Санани танланг</label>
-<input type="date" id="workDate">
+    <div class="card">
+      <h2>Кунлик натижа</h2>
+      <div class="stats">
+        <div class="stat"><small>Асосий иш</small><strong id="mainResult">0:00</strong></div>
+        <div class="stat"><small>Қўшимча иш</small><strong id="extraResult">0:00</strong></div>
+        <div class="stat"><small>Қўшимча иш × 2</small><strong id="doubleResult">0:00</strong></div>
+        <div class="stat"><small>Жами ҳисобланган</small><strong id="totalResult">0:00</strong></div>
+      </div>
+      <div class="actions">
+        <button class="green" onclick="saveDay()">Кунни сақлаш</button>
+        <button class="red" onclick="deleteDay()">Кунни ўчириш</button>
+      </div>
+      <p class="muted">Эслатма: тунги смена ва бир кунда бир нечта алоҳида иш оралиғи ҳозирча қўллаб-қувватланмайди.</p>
+    </div>
+  </section>
 
-<h3>Асосий иш вақти</h3>
-<label>Бошланиш вақти</label>
-<input type="time" id="mainStart" value="08:00">
-<label>Тугаш вақти</label>
-<input type="time" id="mainEnd" value="17:00">
-<button id="saveMain">Асосий иш вақтини сақлаш</button>
+  <section id="monthView" class="view">
+    <div class="card">
+      <h2>Ойлик ҳисобот</h2>
+      <label>Ҳисобот ойи</label>
+      <input type="month" id="monthPicker" onchange="renderMonth()">
+      <div class="stats" style="margin-top:15px">
+        <div class="stat"><small>Асосий иш</small><strong id="mMain">0:00</strong></div>
+        <div class="stat"><small>Қўшимча иш</small><strong id="mExtra">0:00</strong></div>
+        <div class="stat"><small>Қўшимча × 2</small><strong id="mDouble">0:00</strong></div>
+        <div class="stat"><small>Жами</small><strong id="mTotal">0:00</strong></div>
+      </div>
+      <p class="muted" id="mDays">Иш кунлари: 0</p>
+      <div class="actions">
+        <button class="green" onclick="exportMonth()">Ойлик Excel</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Кунлар кесимида</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Сана</th><th>Асосий</th><th>Қўшимча</th><th>Қўшимча ×2</th><th>Жами</th></tr></thead>
+          <tbody id="monthTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-<h3>Қўшимча иш вақти</h3>
-<label>Бошланиш вақти</label>
-<input type="time" id="extraStart" value="17:00">
-<label>Тугаш вақти</label>
-<input type="time" id="extraEnd" value="20:00">
-<button class="green" id="saveExtra">Қўшимча иш вақтини сақлаш</button>
-<p class="info">Қўшимча иш вақти 2 баробар ҳисобланади.</p>
-</div>
-
-<div class="card">
-<h2>Кунлик натижа</h2>
-<div class="grid">
-<div class="stat"><small>Асосий иш</small><strong id="mainResult">0 соат</strong></div>
-<div class="stat"><small>Қўшимча иш</small><strong id="extraResult">0 соат</strong></div>
-<div class="stat"><small>Қўшимча иш × 2</small><strong id="doubleResult">0 соат</strong></div>
-<div class="stat"><small>Жами ҳисобланган</small><strong id="dayTotal">0 соат</strong></div>
-</div>
-<button class="secondary" id="deleteDay">Шу кун маълумотларини ўчириш</button>
-</div>
-
-</section>
-
-<section id="monthlySection" class="hidden">
-
-<div class="card">
-<h2>Ойлик ҳисобот</h2>
-<label>Ҳисобот ойи</label>
-<input type="month" id="monthPicker">
-
-<h2 class="month-title" id="monthTitle"></h2>
-
-<div class="grid">
-<div class="stat"><small>Асосий иш</small><strong id="monthMain">0 соат</strong></div>
-<div class="stat"><small>Қўшимча иш</small><strong id="monthExtra">0 соат</strong></div>
-<div class="stat"><small>Қўшимча иш × 2</small><strong id="monthDouble">0 соат</strong></div>
-<div class="stat"><small>Жами ҳисобланган</small><strong id="monthTotal">0 соат</strong></div>
-</div>
-
-<div class="stat">
-<small>Ишланган кунлар</small>
-<strong id="monthDays">0 кун</strong>
-</div>
-</div>
-
-<div class="card">
-<h2>Кунлар кесимида</h2>
-<div class="scroll">
-<table>
-<thead>
-<tr>
-<th>Сана</th>
-<th>Асосий</th>
-<th>Қўшимча</th>
-<th>× 2</th>
-</tr>
-</thead>
-<tbody id="monthRows"></tbody>
-</table>
-</div>
-</div>
-
-<div class="card">
-<h2>Йиллик ҳисобот</h2>
-<label>Йилни танланг</label>
-<input type="number" id="yearPicker" min="2020" max="2100">
-<div class="scroll">
-<table>
-<thead>
-<tr>
-<th>Ой</th>
-<th>Асосий</th>
-<th>Қўшимча</th>
-<th>Жами</th>
-</tr>
-</thead>
-<tbody id="yearRows"></tbody>
-</table>
-</div>
-</div>
-
-</section>
+  <section id="yearView" class="view">
+    <div class="card">
+      <h2>Йиллик ҳисобот</h2>
+      <label>Йил</label>
+      <input type="number" id="yearPicker" min="2000" max="2100" onchange="renderYear()">
+      <div class="stats" style="margin-top:15px">
+        <div class="stat"><small>Асосий иш</small><strong id="yMain">0:00</strong></div>
+        <div class="stat"><small>Қўшимча иш</small><strong id="yExtra">0:00</strong></div>
+        <div class="stat"><small>Қўшимча × 2</small><strong id="yDouble">0:00</strong></div>
+        <div class="stat"><small>Жами</small><strong id="yTotal">0:00</strong></div>
+      </div>
+      <div class="actions">
+        <button class="green" onclick="exportYear()">Йиллик Excel</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Йиллик диаграмма</h2>
+      <canvas id="yearChart" width="900" height="280"></canvas>
+      <p class="muted">Кўк: асосий иш. Яшил: қўшимча ишнинг 2 баробар ҳисобланган вақти.</p>
+    </div>
+    <div class="card">
+      <h2>12 ойлик натижа</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ой</th><th>Асосий</th><th>Қўшимча</th><th>Қўшимча ×2</th><th>Жами</th></tr></thead>
+          <tbody id="yearTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 </section>
 </main>
 
-<footer>Иш вақтим · Шахсий иш вақти назорати</footer>
-
 <script>
 const $ = id => document.getElementById(id);
-
 const PROFILE_KEY = "ishVaqtimProfile";
-const RECORD_KEY = "ishVaqtimRecords";
+const RECORDS_KEY = "ishVaqtimRecords";
 
-function getProfile(){
- try{return JSON.parse(localStorage.getItem(PROFILE_KEY)) || null}
- catch(e){return null}
+let profile = {};
+let records = {};
+
+function localDate() {
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
-
-function getRecords(){
- try{return JSON.parse(localStorage.getItem(RECORD_KEY)) || {}}
- catch(e){return {}}
+function monthNow() { return localDate().slice(0,7); }
+function readData() {
+  try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch(e) { profile = {}; }
+  try { records = JSON.parse(localStorage.getItem(RECORDS_KEY)) || {}; } catch(e) { records = {}; }
+  if (Array.isArray(records)) {
+    const converted = {};
+    records.forEach(r => { if(r.date) converted[r.date] = r; });
+    records = converted;
+  }
 }
-
-function saveRecords(data){
- localStorage.setItem(RECORD_KEY,JSON.stringify(data));
+function saveRecords() {
+  localStorage.setItem(RECORDS_KEY,JSON.stringify(records));
 }
-
-function formatHours(minutes){
- minutes=Math.round(Number(minutes)||0);
- const h=Math.floor(minutes/60);
- const m=minutes%60;
- return h+" соат"+(m ? " "+m+" дақиқа":"");
+function saveProfile() {
+  profile = {
+    fullName:$("fullName").value.trim(),
+    tabNumber:$("tabNumber").value.trim(),
+    position:$("position").value.trim(),
+    grade:$("grade").value.trim()
+  };
+  if(!profile.fullName) {
+    alert("Илтимос, Ф.И.Ш.ни киритинг.");
+    return;
+  }
+  localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));
+  showDashboard();
 }
-
-function timeMinutes(time){
- if(!time)return 0;
- const p=time.split(":");
- return Number(p[0])*60+Number(p[1]);
+function editProfile() {
+  $("fullName").value=profile.fullName||"";
+  $("tabNumber").value=profile.tabNumber||"";
+  $("position").value=profile.position||"";
+  $("grade").value=profile.grade||"";
+  $("dashboard").classList.add("hidden");
+  $("profileView").classList.add("active");
 }
-
-function duration(start,end,isMain){
- const s=timeMinutes(start);
- const e=timeMinutes(end);
- if(e<=s)return -1;
- let result=e-s;
-
- if(isMain){
-  const lunchStart=12*60;
-  const lunchEnd=13*60;
-  const overlap=Math.max(0,Math.min(e,lunchEnd)-Math.max(s,lunchStart));
-  result-=overlap;
- }
- return result;
+function showDashboard() {
+  $("profileView").classList.remove("active");
+  $("dashboard").classList.remove("hidden");
+  $("profileInfo").innerHTML =
+    "<b>Ф.И.Ш.:</b> "+safe(profile.fullName)+"<br>"+
+    "<b>Табел рақами:</b> "+safe(profile.tabNumber)+"<br>"+
+    "<b>Лавозими:</b> "+safe(profile.position)+"<br>"+
+    "<b>Разряди:</b> "+safe(profile.grade);
+  $("workDate").value=localDate();
+  $("monthPicker").value=monthNow();
+  $("yearPicker").value=new Date().getFullYear();
+  loadDay();
+  renderMonth();
+  renderYear();
 }
-
-function showProfile(){
- $("profileScreen").classList.remove("hidden");
- $("dashboard").classList.add("hidden");
- const p=getProfile();
- if(p){
-  $("fullName").value=p.fullName;
-  $("tabNumber").value=p.tabNumber;
-  $("position").value=p.position;
-  $("grade").value=p.grade;
- }
+function safe(s) {
+  return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-
-function showDashboard(p){
- $("profileScreen").classList.add("hidden");
- $("dashboard").classList.remove("hidden");
- $("displayName").textContent=p.fullName;
- $("displayPosition").textContent="Лавозими: "+p.position;
- $("displayTab").textContent="Табел рақами: "+p.tabNumber;
- $("displayGrade").textContent="Разряди: "+p.grade;
- renderDay();
+function showView(id,btn) {
+  document.querySelectorAll("#dashboard .view").forEach(v=>v.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  if(id==="monthView") renderMonth();
+  if(id==="yearView") renderYear();
 }
-
-$("saveProfile").onclick=()=>{
- const p={
-  fullName:$("fullName").value.trim(),
-  tabNumber:$("tabNumber").value.trim(),
-  position:$("position").value.trim(),
-  grade:$("grade").value.trim()
- };
- if(!p.fullName){alert("Ф.И.Ш.ни киритинг");return}
- localStorage.setItem(PROFILE_KEY,JSON.stringify(p));
- showDashboard(p);
-};
-
-$("editProfile").onclick=showProfile;
-
-function renderDay(){
- const date=$("workDate").value;
- const r=getRecords()[date] || {};
-
- $("mainStart").value=r.main?.start || "08:00";
- $("mainEnd").value=r.main?.end || "17:00";
- $("extraStart").value=r.extra?.start || "17:00";
- $("extraEnd").value=r.extra?.end || "20:00";
-
- const main=r.main?.total || 0;
- const extra=r.extra?.total || 0;
-
- $("mainResult").textContent=formatHours(main);
- $("extraResult").textContent=formatHours(extra);
- $("doubleResult").textContent=formatHours(extra*2);
- $("dayTotal").textContent=formatHours(main+extra*2);
+function minutes(value) {
+  if(!value) return null;
+  const p=value.split(":").map(Number);
+  return p[0]*60+p[1];
 }
-
-function saveWork(type){
- const start=$(type+"Start").value;
- const end=$(type+"End").value;
- const total=duration(start,end,type==="main");
-
- if(total<=0){
-  alert("Тугаш вақти бошланиш вақтидан кейин бўлиши керак");
-  return;
- }
-
- const data=getRecords();
- const date=$("workDate").value;
- if(!date){alert("Санани танланг");return}
-
- if(!data[date])data[date]={};
- data[date][type]={start,end,total};
- saveRecords(data);
- renderDay();
- alert("Маълумот сақланди!");
+function duration(start,end) {
+  const a=minutes(start), b=minutes(end);
+  if(a===null||b===null||b<=a) return 0;
+  return b-a;
 }
-
-$("saveMain").onclick=()=>saveWork("main");
-$("saveExtra").onclick=()=>saveWork("extra");
-$("workDate").onchange=renderDay;
-
-$("deleteDay").onclick=()=>{
- const date=$("workDate").value;
- const data=getRecords();
- if(!data[date])return;
- if(confirm("Шу куннинг барча маълумотлари ўчирилсинми?")){
-  delete data[date];
-  saveRecords(data);
-  renderDay();
- }
-};
-
-function showDaily(){
- $("dailySection").classList.remove("hidden");
- $("monthlySection").classList.add("hidden");
+function overlap(a,b,c,d) {
+  return Math.max(0,Math.min(b,d)-Math.max(a,c));
 }
-
-function showMonthly(){
- $("dailySection").classList.add("hidden");
- $("monthlySection").classList.remove("hidden");
- renderMonthly();
+function getDayValues() {
+  const ms=$("mainStart").value, me=$("mainEnd").value;
+  const es=$("extraStart").value, ee=$("extraEnd").value;
+  let main=duration(ms,me);
+  if(main>0) main-=overlap(minutes(ms),minutes(me),720,780);
+  const extra=duration(es,ee);
+  return {main,extra,total:main+extra*2};
 }
-
-$("dailyTab").onclick=showDaily;
-$("monthlyTab").onclick=showMonthly;
-
-const months=[
-"Январь","Февраль","Март","Апрель","Май","Июнь",
-"Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"
-];
-
-function renderMonthly(){
- const value=$("monthPicker").value;
- if(!value)return;
-
- const [year,month]=value.split("-").map(Number);
- const prefix=year+"-"+String(month).padStart(2,"0");
- const records=getRecords();
-
- let main=0,extra=0,days=0;
- let rows="";
-
- Object.keys(records).sort().forEach(date=>{
-  if(!date.startsWith(prefix))return;
+function fmt(n) {
+  n=Math.max(0,Math.round(n||0));
+  return Math.floor(n/60)+":"+String(n%60).padStart(2,"0");
+}
+function calculateDay() {
+  const v=getDayValues();
+  $("mainResult").textContent=fmt(v.main);
+  $("extraResult").textContent=fmt(v.extra);
+  $("doubleResult").textContent=fmt(v.extra*2);
+  $("totalResult").textContent=fmt(v.total);
+}
+function loadDay() {
+  const date=$("workDate").value;
   const r=records[date];
-  const m=r.main?.total || 0;
-  const x=r.extra?.total || 0;
-  if(m>0 || x>0)days++;
-  main+=m;
-  extra+=x;
-
-  rows+="<tr><td>"+date.slice(8,10)+"</td>"+
-  "<td>"+formatHours(m)+"</td>"+
-  "<td>"+formatHours(x)+"</td>"+
-  "<td>"+formatHours(x*2)+"</td></tr>";
- });
-
- $("monthTitle").textContent=months[month-1]+" "+year;
- $("monthMain").textContent=formatHours(main);
- $("monthExtra").textContent=formatHours(extra);
- $("monthDouble").textContent=formatHours(extra*2);
- $("monthTotal").textContent=formatHours(main+extra*2);
- $("monthDays").textContent=days+" кун";
- $("monthRows").innerHTML=rows || '<tr><td colspan="4">Ҳозирча маълумот йўқ</td></tr>';
-
- renderYear();
+  $("mainStart").value=r?.mainStart||"08:00";
+  $("mainEnd").value=r?.mainEnd||"17:00";
+  $("extraStart").value=r?.extraStart||"";
+  $("extraEnd").value=r?.extraEnd||"";
+  calculateDay();
+}
+function saveDay() {
+  const date=$("workDate").value;
+  if(!date) return alert("Санани танланг.");
+  const v=getDayValues();
+  if(v.main===0 && v.extra===0) return alert("Иш вақтини тўғри киритинг.");
+  records[date]={
+    date,
+    mainStart:$("mainStart").value,
+    mainEnd:$("mainEnd").value,
+    extraStart:$("extraStart").value,
+    extraEnd:$("extraEnd").value,
+    main:v.main,
+    extra:v.extra
+  };
+  saveRecords();
+  renderMonth(); renderYear();
+  alert("Кунлик иш вақти сақланди.");
+}
+function deleteDay() {
+  const date=$("workDate").value;
+  if(!records[date]) return alert("Бу сана учун сақланган маълумот йўқ.");
+  if(confirm(date+" санасидаги маълумот ўчирилсинми?")) {
+    delete records[date];
+    saveRecords(); loadDay(); renderMonth(); renderYear();
+  }
+}
+function monthRecords(month) {
+  return Object.values(records).filter(r=>r.date&&r.date.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function totalOf(list) {
+  return list.reduce((t,r)=>{
+    t.main+=Number(r.main)||0;
+    t.extra+=Number(r.extra)||0;
+    return t;
+  },{main:0,extra:0});
+}
+function renderMonth() {
+  if(!$("monthPicker").value) return;
+  const month=$("monthPicker").value;
+  const list=monthRecords(month);
+  const t=totalOf(list);
+  $("mMain").textContent=fmt(t.main);
+  $("mExtra").textContent=fmt(t.extra);
+  $("mDouble").textContent=fmt(t.extra*2);
+  $("mTotal").textContent=fmt(t.main+t.extra*2);
+  $("mDays").textContent="Иш кунлари: "+list.length;
+  $("monthTable").innerHTML=list.map(r=>`
+    <tr><td>${safe(r.date)}</td><td>${fmt(r.main)}</td><td>${fmt(r.extra)}</td>
+    <td>${fmt(r.extra*2)}</td><td>${fmt((r.main||0)+(r.extra||0)*2)}</td></tr>
+  `).join("") || '<tr><td colspan="5">Ҳозирча маълумот йўқ</td></tr>';
+}
+const monthNames=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+function renderYear() {
+  const year=String($("yearPicker").value||new Date().getFullYear());
+  let ym=[], yearlyMain=0, yearlyExtra=0;
+  let rows="";
+  for(let i=1;i<=12;i++) {
+    const month=year+"-"+String(i).padStart(2,"0");
+    const t=totalOf(monthRecords(month));
+    yearlyMain+=t.main; yearlyExtra+=t.extra;
+    ym.push(t);
+    rows+=`<tr><td>${monthNames[i-1]}</td><td>${fmt(t.main)}</td><td>${fmt(t.extra)}</td><td>${fmt(t.extra*2)}</td><td>${fmt(t.main+t.extra*2)}</td></tr>`;
+  }
+  $("yMain").textContent=fmt(yearlyMain);
+  $("yExtra").textContent=fmt(yearlyExtra);
+  $("yDouble").textContent=fmt(yearlyExtra*2);
+  $("yTotal").textContent=fmt(yearlyMain+yearlyExtra*2);
+  $("yearTable").innerHTML=rows+`<tr><th>ЙИЛЛИК ЖАМИ</th><th>${fmt(yearlyMain)}</th><th>${fmt(yearlyExtra)}</th><th>${fmt(yearlyExtra*2)}</th><th>${fmt(yearlyMain+yearlyExtra*2)}</th></tr>`;
+  drawChart(ym);
+}
+function drawChart(data) {
+  const c=$("yearChart"), ctx=c.getContext("2d");
+  const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const max=Math.max(60,...data.map(x=>x.main+x.extra*2));
+  const base=h-35, chartH=h-65, slot=w/12, bw=22;
+  ctx.font="15px Arial"; ctx.textAlign="center";
+  for(let i=0;i<12;i++) {
+    const x=i*slot+slot/2;
+    const a=data[i].main/max*chartH;
+    const e=data[i].extra*2/max*chartH;
+    ctx.fillStyle="#3185f5";
+    ctx.fillRect(x-bw,base-a,bw,a);
+    ctx.fillStyle="#18bd88";
+    ctx.fillRect(x+2,base-e,bw,e);
+    ctx.fillStyle="#b6c5d8";
+    ctx.fillText(String(i+1),x, h-10);
+  }
+}
+function makeExcel(sheets,filename) {
+  if(typeof XLSX==="undefined") {
+    alert("Excel кутубхонаси юкланмади. Интернетни текшириб, саҳифани қайта очинг.");
+    return;
+  }
+  const wb=XLSX.utils.book_new();
+  sheets.forEach(s=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s.rows),s.name));
+  XLSX.writeFile(wb,filename);
+}
+function exportMonth() {
+  const month=$("monthPicker").value;
+  const list=monthRecords(month);
+  const rows=[["Сана","Асосий иш (соат)","Қўшимча иш (соат)","Қўшимча ×2 (соат)","Жами (соат)"]];
+  list.forEach(r=>rows.push([
+    r.date,
+    +((r.main||0)/60).toFixed(2),
+    +((r.extra||0)/60).toFixed(2),
+    +((r.extra||0)*2/60).toFixed(2),
+    +(((r.main||0)+(r.extra||0)*2)/60).toFixed(2)
+  ]));
+  const t=totalOf(list);
+  rows.push(["ОЙЛИК ЖАМИ",+(t.main/60).toFixed(2),+(t.extra/60).toFixed(2),+(t.extra*2/60).toFixed(2),+((t.main+t.extra*2)/60).toFixed(2)]);
+  makeExcel([{name:"Ойлик ҳисобот",rows}], "Иш вақтим_"+month+".xlsx");
+}
+function exportYear() {
+  const year=String($("yearPicker").value);
+  const summary=[["Ой","Асосий иш (соат)","Қўшимча иш (соат)","Қўшимча ×2 (соат)","Жами (соат)"]];
+  const daily=[["Сана","Асосий иш (соат)","Қўшимча иш (соат)","Қўшимча ×2 (соат)","Жами (соат)"]];
+  let ym=0,ye=0;
+  for(let i=1;i<=12;i++) {
+    const month=year+"-"+String(i).padStart(2,"0");
+    const list=monthRecords(month), t=totalOf(list);
+    ym+=t.main; ye+=t.extra;
+    summary.push([monthNames[i-1],+(t.main/60).toFixed(2),+(t.extra/60).toFixed(2),+(t.extra*2/60).toFixed(2),+((t.main+t.extra*2)/60).toFixed(2)]);
+    list.forEach(r=>daily.push([r.date,+((r.main||0)/60).toFixed(2),+((r.extra||0)/60).toFixed(2),+((r.extra||0)*2/60).toFixed(2),+(((r.main||0)+(r.extra||0)*2)/60).toFixed(2)]));
+  }
+  summary.push(["ЙИЛЛИК ЖАМИ",+(ym/60).toFixed(2),+(ye/60).toFixed(2),+(ye*2/60).toFixed(2),+((ym+ye*2)/60).toFixed(2)]);
+  makeExcel([{name:"Йиллик ҳисобот",rows:summary},{name:"Кунлик маълумотлар",rows:daily}],"Иш вақтим_"+year+".xlsx");
 }
 
-function renderYear(){
- const year=Number($("yearPicker").value);
- const records=getRecords();
- let rows="";
-
- months.forEach((name,index)=>{
-  const prefix=year+"-"+String(index+1).padStart(2,"0");
-  let main=0,extra=0;
-
-  Object.keys(records).forEach(date=>{
-   if(!date.startsWith(prefix))return;
-   const r=records[date];
-   main+=r.main?.total || 0;
-   extra+=r.extra?.total || 0;
-  });
-
-  rows+="<tr><td>"+name+"</td>"+
-  "<td>"+formatHours(main)+"</td>"+
-  "<td>"+formatHours(extra)+"</td>"+
-  "<td>"+formatHours(main+extra*2)+"</td></tr>";
- });
-
- $("yearRows").innerHTML=rows;
+readData();
+if(profile.fullName) {
+  $("fullName").value=profile.fullName||"";
+  $("tabNumber").value=profile.tabNumber||"";
+  $("position").value=profile.position||"";
+  $("grade").value=profile.grade||"";
+  showDashboard();
+} else {
+  $("workDate").value=localDate();
 }
-
-$("monthPicker").onchange=renderMonthly;
-$("yearPicker").onchange=renderYear;
-
-const today=new Date();
-const dateText=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
-$("workDate").value=dateText;
-$("monthPicker").value=dateText.slice(0,7);
-$("yearPicker").value=today.getFullYear();
-
-const profile=getProfile();
-if(profile)showDashboard(profile);
-else showProfile();
- 
-function drawYearChart(year) {
-  const records = getRecords();
-  const values = [];
-
-  for (let i = 1; i <= 12; i++) {
-    const prefix = year + "-" + String(i).padStart(2, "0");
-    let main = 0, extra = 0;
-
-    Object.keys(records).forEach(date => {
-      if (!date.startsWith(prefix)) return;
-      const r = records[date];
-      main += r.main?.total || 0;
-      extra += (r.extra?.total || 0) * 2;
-    });
-
-    values.push({
-      name: months[i - 1].slice(0, 3),
-      main: main / 60,
-      extra: extra / 60
-    });
-  }
-
-  const card = $("yearRows").closest(".card");
-  let canvas = $("yearlyChart");
-
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-    canvas.id = "yearlyChart";
-    canvas.style.width = "100%";
-    canvas.style.height = "260px";
-    canvas.width = 600;
-    canvas.height = 260;
-    card.insertBefore(canvas, card.querySelector(".scroll"));
-  }
-
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
-
-  const max = Math.max(10, ...values.map(v => v.main + v.extra));
-  const chartH = 180;
-  const bottom = 215;
-
-  ctx.font = "12px Arial";
-  ctx.textAlign = "center";
-
-  for (let i = 0; i <= 4; i++) {
-    const y = bottom - chartH * i / 4;
-    ctx.strokeStyle = "#29415d";
-    ctx.beginPath();
-    ctx.moveTo(35, y);
-    ctx.lineTo(590, y);
-    ctx.stroke();
-  }
-
-  values.forEach((v, i) => {
-    const x = 48 + i * 46;
-    const mainH = v.main / max * chartH;
-    const extraH = v.extra / max * chartH;
-
-    ctx.fillStyle = "#3988df";
-    ctx.fillRect(x, bottom - mainH, 25, mainH);
-
-    ctx.fillStyle = "#21a58b";
-    ctx.fillRect(x, bottom - mainH - extraH, 25, extraH);
-
-    ctx.fillStyle = "#dceaff";
-    ctx.fillText(v.name, x + 12, 237);
-  });
-
-  ctx.textAlign = "left";
-  ctx.fillStyle = "#3988df";
-  ctx.fillRect(40, 12, 12, 12);
-  ctx.fillStyle = "#edf4ff";
-  ctx.fillText("Асосий иш", 58, 23);
-
-  ctx.fillStyle = "#21a58b";
-  ctx.fillRect(180, 12, 12, 12);
-  ctx.fillStyle = "#edf4ff";
-  ctx.fillText("Қўшимча иш × 2", 198, 23);
-}
-
-const oldRenderYear = renderYear;
-
-renderYear = function() {
-  oldRenderYear();
-  drawYearChart(Number($("yearPicker").value));
-};
-
 </script>
- 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-<script>
-function exportMonthlyExcel() {
-  if (typeof XLSX === "undefined") {
-    alert("Excel кутубхонаси юкланмади. Интернетни текширинг.");
-    return;
-  }
-
-  const value = $("monthPicker").value;
-  if (!value) {
-    alert("Ҳисобот ойини танланг.");
-    return;
-  }
-
-  const records = getRecords();
-  const [year, month] = value.split("-").map(Number);
-  const prefix = value;
-
-  const rows = [
-    ["Сана", "Асосий иш (соат)", "Қўшимча иш (соат)",
-     "Қўшимча иш × 2 (соат)", "Жами ҳисобланган (соат)"]
-  ];
-
-  let mainTotal = 0;
-  let extraTotal = 0;
-
-  Object.keys(records).sort().forEach(date => {
-    if (!date.startsWith(prefix)) return;
-
-    const r = records[date];
-    const main = r.main?.total || 0;
-    const extra = r.extra?.total || 0;
-
-    mainTotal += main;
-    extraTotal += extra;
-
-    rows.push([
-      date,
-      +(main / 60).toFixed(2),
-      +(extra / 60).toFixed(2),
-      +(extra * 2 / 60).toFixed(2),
-      +((main + extra * 2) / 60).toFixed(2)
-    ]);
-  });
-
-  rows.push([]);
-  rows.push([
-    "ЖАМИ",
-    +(mainTotal / 60).toFixed(2),
-    +(extraTotal / 60).toFixed(2),
-    +(extraTotal * 2 / 60).toFixed(2),
-    +((mainTotal + extraTotal * 2) / 60).toFixed(2)
-  ]);
-
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(wb, ws, "Ойлик ҳисобот");
-
-  XLSX.writeFile(
-    wb,
-    "Иш вақтим_" + year + "_" + String(month).padStart(2,"0") + ".xlsx"
-  );
-}
-
-function exportYearExcel() {
-  if (typeof XLSX === "undefined") {
-    alert("Excel кутубхонаси юкланмади. Интернетни текширинг.");
-    return;
-  }
-
-  const year = Number($("yearPicker").value);
-  const records = getRecords();
-
-  const monthsList = [
-    "Январь","Февраль","Март","Апрель","Май","Июнь",
-    "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"
-  ];
-
-  const summary = [
-    ["Ой", "Асосий иш (соат)", "Қўшимча иш (соат)",
-     "Қўшимча иш × 2 (соат)", "Жами (соат)"]
-  ];
-
-  const daily = [
-    ["Сана", "Асосий иш (соат)", "Қўшимча иш (соат)",
-     "Қўшимча иш × 2 (соат)", "Жами (соат)"]
-  ];
-
-  let yearMain = 0;
-  let yearExtra = 0;
-
-  monthsList.forEach((name, index) => {
-    const prefix = year + "-" + String(index + 1).padStart(2, "0");
-    let main = 0;
-    let extra = 0;
-
-    Object.keys(records).sort().forEach(date => {
-      if (!date.startsWith(prefix)) return;
-
-      const r = records[date];
-      const m = r.main?.total || 0;
-      const e = r.extra?.total || 0;
-
-      main += m;
-      extra += e;
-
-      daily.push([
-        date,
-        +(m / 60).toFixed(2),
-        +(e / 60).toFixed(2),
-        +(e * 2 / 60).toFixed(2),
-        +((m + e * 2) / 60).toFixed(2)
-      ]);
-    });
-
-    yearMain += main;
-    yearExtra += extra;
-
-    summary.push([
-      name,
-      +(main / 60).toFixed(2),
-      +(extra / 60).toFixed(2),
-      +(extra * 2 / 60).toFixed(2),
-      +((main + extra * 2) / 60).toFixed(2)
-    ]);
-  });
-
-  summary.push([
-    "ЙИЛЛИК ЖАМИ",
-    +(yearMain / 60).toFixed(2),
-    +(yearExtra / 60).toFixed(2),
-    +(yearExtra * 2 / 60).toFixed(2),
-    +((yearMain + yearExtra * 2) / 60).toFixed(2)
-  ]);
-
-  const wb = XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(
-    wb, XLSX.utils.aoa_to_sheet(summary), "Йиллик ҳисобот"
-  );
-
-  XLSX.utils.book_append_sheet(
-    wb, XLSX.utils.aoa_to_sheet(daily), "Кунлик маълумотлар"
-  );
-
-  XLSX.writeFile(wb, "Иш вақтим_" + year + ".xlsx");
-}
-
-// Excel тугмаларини яратиш
-const exportBox = document.createElement("div");
-exportBox.className = "card";
-exportBox.innerHTML = `
-  <h2>Excel ҳисоботлари</h2>
-  <button id="exportMonth">Ойлик ҳисоботни Excel'га сақлаш</button>
-  <button id="exportYear" class="green">Йиллик ҳисоботни Excel'га сақлаш</button>
-`;
-
-$("monthlySection").prepend(exportBox);
-
-$("exportMonth").onclick = exportMonthlyExcel;
-$("exportYear").onclick = exportYearExcel;
-</script>
-</body>
-</html>
-
 </body>
 </html>
