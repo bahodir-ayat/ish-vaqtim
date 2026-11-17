@@ -1,13 +1,79 @@
+
 <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
     <title>Иш вақтим</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Иш вақтим</h1>
-    <p>Шахсий иш вақтини ҳисобга олиш иловаси</p>
-    <h2>Хуш келибсиз!</h2>
+
+<div class="container">
+
+    <header class="header">
+        <div>
+            <div class="logo">Иш вақтим</div>
+            <div class="subtitle">Шахсий иш вақти назорати</div>
+        </div>
+        <div style="font-size:28px;">◷</div>
+    </header>
+
+    <section class="card">
+        <div class="card-title">БУГУНГИ ИШ КУНИ</div>
+        <div class="date" id="todayDate">--</div>
+        <div class="day" id="todayDay">--</div>
+    </section>
+
+    <div class="stats">
+        <section class="card">
+            <div class="card-title">АСОСИЙ ИШ</div>
+            <div class="stat-number blue" id="mainHours">0 соат</div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">ҚЎШИМЧА ИШ</div>
+            <div class="stat-number green" id="extraHours">0 соат</div>
+        </section>
+    </div>
+
+    <section class="card">
+        <div class="card-title">ҚЎШИМЧА ИШ ВАҚТИ (2Х)</div>
+        <div class="stat-number green" id="doubleHours">0 соат</div>
+    </section>
+
+    <button onclick="alert('Иш вақтини қайд этиш функциясини кейинги босқичда қўшамиз!')">
+        + Иш вақтини белгилаш
+    </button>
+
+    <div class="footer">
+        Иш вақтим © 2026
+    </div>
+
+</div>
+
+<script>
+const now = new Date();
+
+const days = [
+    "Якшанба", "Душанба", "Сешанба",
+    "Чоршанба", "Пайшанба", "Жума", "Шанба"
+];
+
+const months = [
+    "январь", "февраль", "март", "апрель",
+    "май", "июнь", "июль", "август",
+    "сентябрь", "октябрь", "ноябрь", "декабрь"
+];
+
+document.getElementById("todayDate").textContent =
+    now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
+
+document.getElementById("todayDay").textContent =
+    days[now.getDay()];
+</script>
+
 </body>
 </html>
+
