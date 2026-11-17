@@ -2,78 +2,192 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0b1120">
-    <title>Иш вақтим</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1120">
+<title>Иш вақтим</title>
+<link rel="stylesheet" href="style.css">
 
+<style>
+input {
+  width:100%;
+  padding:14px;
+  margin-top:7px;
+  background:#0b1120;
+  color:white;
+  border:1px solid #344963;
+  border-radius:10px;
+  font-size:16px;
+}
+.field { margin-bottom:17px; }
+.field label { color:#aabbd0; font-size:14px; }
+.profile-name { color:#55aaff; margin-top:8px; }
+.hidden { display:none; }
+</style>
+</head>
+
+<body>
 <div class="container">
 
-    <header class="header">
-        <div>
-            <div class="logo">Иш вақтим</div>
-            <div class="subtitle">Шахсий иш вақти назорати</div>
-        </div>
-        <div style="font-size:28px;">◷</div>
-    </header>
+<header class="header">
+  <div>
+    <div class="logo">Иш вақтим</div>
+    <div class="subtitle">Шахсий иш вақти назорати</div>
+  </div>
+  <div style="font-size:28px">◷</div>
+</header>
 
-    <section class="card">
-        <div class="card-title">БУГУНГИ ИШ КУНИ</div>
-        <div class="date" id="todayDate">--</div>
-        <div class="day" id="todayDay">--</div>
-    </section>
+<section id="profileScreen" class="card hidden">
+  <h2>Ходим профили</h2>
+  <p class="subtitle" style="margin:10px 0 20px">
+    Иловани бошлаш учун маълумотларни киритинг
+  </p>
 
-    <div class="stats">
-        <section class="card">
-            <div class="card-title">АСОСИЙ ИШ</div>
-            <div class="stat-number blue" id="mainHours">0 соат</div>
-        </section>
-
-        <section class="card">
-            <div class="card-title">ҚЎШИМЧА ИШ</div>
-            <div class="stat-number green" id="extraHours">0 соат</div>
-        </section>
+  <form id="profileForm">
+    <div class="field">
+      <label>Ф.И.Ш.</label>
+      <input id="fullName" required placeholder="Фамилия, исм, шариф">
     </div>
 
-    <section class="card">
-        <div class="card-title">ҚЎШИМЧА ИШ ВАҚТИ (2Х)</div>
-        <div class="stat-number green" id="doubleHours">0 соат</div>
-    </section>
-
-    <button onclick="alert('Иш вақтини қайд этиш функциясини кейинги босқичда қўшамиз!')">
-        + Иш вақтини белгилаш
-    </button>
-
-    <div class="footer">
-        Иш вақтим © 2026
+    <div class="field">
+      <label>Табел рақами</label>
+      <input id="tabNumber" required placeholder="Масалан: 00125">
     </div>
 
+    <div class="field">
+      <label>Лавозими</label>
+      <input id="position" required placeholder="Лавозимингиз">
+    </div>
+
+    <div class="field">
+      <label>Разряди</label>
+      <input id="grade" required placeholder="Масалан: 4-разряд">
+    </div>
+
+    <button type="submit">Профилни сақлаш</button>
+  </form>
+</section>
+
+<main id="dashboard" class="hidden">
+
+<section class="card">
+  <div class="card-title">ХОДИМ ПРОФИЛИ</div>
+  <h3 id="displayName"></h3>
+  <p class="subtitle" id="displayPosition"></p>
+  <p class="subtitle" id="displayTab"></p>
+  <p class="subtitle" id="displayGrade"></p>
+  <button style="margin-top:15px" onclick="editProfile()">
+    Профилни таҳрирлаш
+  </button>
+</section>
+
+<section class="card">
+  <div class="card-title">БУГУНГИ ИШ КУНИ</div>
+  <div class="date" id="todayDate"></div>
+  <div class="day" id="todayDay"></div>
+</section>
+
+<div class="stats">
+  <section class="card">
+    <div class="card-title">АСОСИЙ ИШ</div>
+    <div class="stat-number blue">0 соат</div>
+  </section>
+
+  <section class="card">
+    <div class="card-title">ҚЎШИМЧА ИШ</div>
+    <div class="stat-number green">0 соат</div>
+  </section>
+</div>
+
+<section class="card">
+  <div class="card-title">ҚЎШИМЧА ИШ ВАҚТИ (2Х)</div>
+  <div class="stat-number green">0 соат</div>
+</section>
+
+<button onclick="alert('Иш вақтини қайд этиш функцияси кейинги босқичда қўшилади.')">
+  + Иш вақтини белгилаш
+</button>
+
+</main>
 </div>
 
 <script>
+const profileScreen = document.getElementById("profileScreen");
+const dashboard = document.getElementById("dashboard");
+const profileForm = document.getElementById("profileForm");
+
+function showProfile() {
+  profileScreen.classList.remove("hidden");
+  dashboard.classList.add("hidden");
+}
+
+function showDashboard(profile) {
+  profileScreen.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+
+  document.getElementById("displayName").textContent =
+    profile.fullName;
+  document.getElementById("displayPosition").textContent =
+    "Лавозими: " + profile.position;
+  document.getElementById("displayTab").textContent =
+    "Табел рақами: " + profile.tabNumber;
+  document.getElementById("displayGrade").textContent =
+    "Разряди: " + profile.grade;
+}
+
+profileForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const profile = {
+    fullName: document.getElementById("fullName").value.trim(),
+    tabNumber: document.getElementById("tabNumber").value.trim(),
+    position: document.getElementById("position").value.trim(),
+    grade: document.getElementById("grade").value.trim()
+  };
+
+  localStorage.setItem("ishVaqtimProfile", JSON.stringify(profile));
+  showDashboard(profile);
+});
+
+function editProfile() {
+  const profile = JSON.parse(
+    localStorage.getItem("ishVaqtimProfile")
+  );
+
+  document.getElementById("fullName").value = profile.fullName;
+  document.getElementById("tabNumber").value = profile.tabNumber;
+  document.getElementById("position").value = profile.position;
+  document.getElementById("grade").value = profile.grade;
+
+  showProfile();
+}
+
+const savedProfile = localStorage.getItem("ishVaqtimProfile");
+
+if (savedProfile) {
+  showDashboard(JSON.parse(savedProfile));
+} else {
+  showProfile();
+}
+
 const now = new Date();
 
 const days = [
-    "Якшанба", "Душанба", "Сешанба",
-    "Чоршанба", "Пайшанба", "Жума", "Шанба"
+  "Якшанба", "Душанба", "Сешанба",
+  "Чоршанба", "Пайшанба", "Жума", "Шанба"
 ];
 
 const months = [
-    "январь", "февраль", "март", "апрель",
-    "май", "июнь", "июль", "август",
-    "сентябрь", "октябрь", "ноябрь", "декабрь"
+  "январь", "февраль", "март", "апрель",
+  "май", "июнь", "июль", "август",
+  "сентябрь", "октябрь", "ноябрь", "декабрь"
 ];
 
 document.getElementById("todayDate").textContent =
-    now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
+  now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
 
 document.getElementById("todayDay").textContent =
-    days[now.getDay()];
+  days[now.getDay()];
 </script>
-
 </body>
 </html>
-
