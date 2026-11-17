@@ -1,0 +1,14 @@
+
+{
+  "name": "Иш вақтим",
+  "short_name": "Иш вақтим",
+  "description": "Иш соатларини ҳисоблаш ва назорат қилиш иловаси",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "lang": "uz",
+  "icons": []
+}
