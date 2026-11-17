@@ -499,5 +499,173 @@ renderYear = function() {
 };
 
 </script>
+ 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+function exportMonthlyExcel() {
+  if (typeof XLSX === "undefined") {
+    alert("Excel кутубхонаси юкланмади. Интернетни текширинг.");
+    return;
+  }
+
+  const value = $("monthPicker").value;
+  if (!value) {
+    alert("Ҳисобот ойини танланг.");
+    return;
+  }
+
+  const records = getRecords();
+  const [year, month] = value.split("-").map(Number);
+  const prefix = value;
+
+  const rows = [
+    ["Сана", "Асосий иш (соат)", "Қўшимча иш (соат)",
+     "Қўшимча иш × 2 (соат)", "Жами ҳисобланган (соат)"]
+  ];
+
+  let mainTotal = 0;
+  let extraTotal = 0;
+
+  Object.keys(records).sort().forEach(date => {
+    if (!date.startsWith(prefix)) return;
+
+    const r = records[date];
+    const main = r.main?.total || 0;
+    const extra = r.extra?.total || 0;
+
+    mainTotal += main;
+    extraTotal += extra;
+
+    rows.push([
+      date,
+      +(main / 60).toFixed(2),
+      +(extra / 60).toFixed(2),
+      +(extra * 2 / 60).toFixed(2),
+      +((main + extra * 2) / 60).toFixed(2)
+    ]);
+  });
+
+  rows.push([]);
+  rows.push([
+    "ЖАМИ",
+    +(mainTotal / 60).toFixed(2),
+    +(extraTotal / 60).toFixed(2),
+    +(extraTotal * 2 / 60).toFixed(2),
+    +((mainTotal + extraTotal * 2) / 60).toFixed(2)
+  ]);
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Ойлик ҳисобот");
+
+  XLSX.writeFile(
+    wb,
+    "Иш вақтим_" + year + "_" + String(month).padStart(2,"0") + ".xlsx"
+  );
+}
+
+function exportYearExcel() {
+  if (typeof XLSX === "undefined") {
+    alert("Excel кутубхонаси юкланмади. Интернетни текширинг.");
+    return;
+  }
+
+  const year = Number($("yearPicker").value);
+  const records = getRecords();
+
+  const monthsList = [
+    "Январь","Февраль","Март","Апрель","Май","Июнь",
+    "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"
+  ];
+
+  const summary = [
+    ["Ой", "Асосий иш (соат)", "Қўшимча иш (соат)",
+     "Қўшимча иш × 2 (соат)", "Жами (соат)"]
+  ];
+
+  const daily = [
+    ["Сана", "Асосий иш (соат)", "Қўшимча иш (соат)",
+     "Қўшимча иш × 2 (соат)", "Жами (соат)"]
+  ];
+
+  let yearMain = 0;
+  let yearExtra = 0;
+
+  monthsList.forEach((name, index) => {
+    const prefix = year + "-" + String(index + 1).padStart(2, "0");
+    let main = 0;
+    let extra = 0;
+
+    Object.keys(records).sort().forEach(date => {
+      if (!date.startsWith(prefix)) return;
+
+      const r = records[date];
+      const m = r.main?.total || 0;
+      const e = r.extra?.total || 0;
+
+      main += m;
+      extra += e;
+
+      daily.push([
+        date,
+        +(m / 60).toFixed(2),
+        +(e / 60).toFixed(2),
+        +(e * 2 / 60).toFixed(2),
+        +((m + e * 2) / 60).toFixed(2)
+      ]);
+    });
+
+    yearMain += main;
+    yearExtra += extra;
+
+    summary.push([
+      name,
+      +(main / 60).toFixed(2),
+      +(extra / 60).toFixed(2),
+      +(extra * 2 / 60).toFixed(2),
+      +((main + extra * 2) / 60).toFixed(2)
+    ]);
+  });
+
+  summary.push([
+    "ЙИЛЛИК ЖАМИ",
+    +(yearMain / 60).toFixed(2),
+    +(yearExtra / 60).toFixed(2),
+    +(yearExtra * 2 / 60).toFixed(2),
+    +((yearMain + yearExtra * 2) / 60).toFixed(2)
+  ]);
+
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    wb, XLSX.utils.aoa_to_sheet(summary), "Йиллик ҳисобот"
+  );
+
+  XLSX.utils.book_append_sheet(
+    wb, XLSX.utils.aoa_to_sheet(daily), "Кунлик маълумотлар"
+  );
+
+  XLSX.writeFile(wb, "Иш вақтим_" + year + ".xlsx");
+}
+
+// Excel тугмаларини яратиш
+const exportBox = document.createElement("div");
+exportBox.className = "card";
+exportBox.innerHTML = `
+  <h2>Excel ҳисоботлари</h2>
+  <button id="exportMonth">Ойлик ҳисоботни Excel'га сақлаш</button>
+  <button id="exportYear" class="green">Йиллик ҳисоботни Excel'га сақлаш</button>
+`;
+
+$("monthlySection").prepend(exportBox);
+
+$("exportMonth").onclick = exportMonthlyExcel;
+$("exportYear").onclick = exportYearExcel;
+</script>
+</body>
+</html>
+
 </body>
 </html>
