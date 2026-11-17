@@ -32,11 +32,33 @@ jobs:
           cp index.html www/
           cp manifest.json www/
           cp sw.js www/
-          if [ -f style.css ]; then cp style.css www/; fi
+          if [ -f style.css ]; then cp style.css www/; 
+        run: |
+          npm install sharp
+          mkdir -p resources
+          node -e "require('sharp')('ish-vaqtim-icon.png').resize(1024,1024).png().toFile('resources/icon.png')"
+          npm install @capacitor/assets --save-dev
+          npx capacitor-assets generate --android
+
+
 
       - name: Install packages
         run: npm install
-
+       
+      - name: Generate Android app icon
+        run: |
+          mkdir -p assets
+          npm install sharp
+          node -e "require('sharp')('ish-vaqtim-icon.png').resize(1024,1024).png().toFile('assets/icon.png')"
+          npm install @capacitor/assets --save-dev
+          npx capacitor-assets generate --android
+ 
+        run: |
+          npm install sharp
+          mkdir -p resources
+          node -e "require('sharp')('ish-vaqtim-icon.png').resize(1024,1024).png().toFile('resources/icon.png')"
+          npm install @capacitor/assets --save-dev
+          npx capacitor-assets generate --android
       - name: Create Android project
         run: npx cap add android
 
