@@ -408,6 +408,96 @@ $("yearPicker").value=today.getFullYear();
 const profile=getProfile();
 if(profile)showDashboard(profile);
 else showProfile();
+ 
+function drawYearChart(year) {
+  const records = getRecords();
+  const values = [];
+
+  for (let i = 1; i <= 12; i++) {
+    const prefix = year + "-" + String(i).padStart(2, "0");
+    let main = 0, extra = 0;
+
+    Object.keys(records).forEach(date => {
+      if (!date.startsWith(prefix)) return;
+      const r = records[date];
+      main += r.main?.total || 0;
+      extra += (r.extra?.total || 0) * 2;
+    });
+
+    values.push({
+      name: months[i - 1].slice(0, 3),
+      main: main / 60,
+      extra: extra / 60
+    });
+  }
+
+  const card = $("yearRows").closest(".card");
+  let canvas = $("yearlyChart");
+
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.id = "yearlyChart";
+    canvas.style.width = "100%";
+    canvas.style.height = "260px";
+    canvas.width = 600;
+    canvas.height = 260;
+    card.insertBefore(canvas, card.querySelector(".scroll"));
+  }
+
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const max = Math.max(10, ...values.map(v => v.main + v.extra));
+  const chartH = 180;
+  const bottom = 215;
+
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+
+  for (let i = 0; i <= 4; i++) {
+    const y = bottom - chartH * i / 4;
+    ctx.strokeStyle = "#29415d";
+    ctx.beginPath();
+    ctx.moveTo(35, y);
+    ctx.lineTo(590, y);
+    ctx.stroke();
+  }
+
+  values.forEach((v, i) => {
+    const x = 48 + i * 46;
+    const mainH = v.main / max * chartH;
+    const extraH = v.extra / max * chartH;
+
+    ctx.fillStyle = "#3988df";
+    ctx.fillRect(x, bottom - mainH, 25, mainH);
+
+    ctx.fillStyle = "#21a58b";
+    ctx.fillRect(x, bottom - mainH - extraH, 25, extraH);
+
+    ctx.fillStyle = "#dceaff";
+    ctx.fillText(v.name, x + 12, 237);
+  });
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#3988df";
+  ctx.fillRect(40, 12, 12, 12);
+  ctx.fillStyle = "#edf4ff";
+  ctx.fillText("Асосий иш", 58, 23);
+
+  ctx.fillStyle = "#21a58b";
+  ctx.fillRect(180, 12, 12, 12);
+  ctx.fillStyle = "#edf4ff";
+  ctx.fillText("Қўшимча иш × 2", 198, 23);
+}
+
+const oldRenderYear = renderYear;
+
+renderYear = function() {
+  oldRenderYear();
+  drawYearChart(Number($("yearPicker").value));
+};
+
 </script>
 </body>
 </html>
