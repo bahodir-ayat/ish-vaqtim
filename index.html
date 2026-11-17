@@ -150,6 +150,16 @@ canvas {width:100%;height:250px}
     <button data-view="yearView" onclick="showView('yearView',this)">Йиллик</button>
   </nav>
 
+<div class="card">
+  <h2>Маълумотлар хавфсизлиги</h2>
+  <p class="muted">Иш соатлари ва ходим профилининг захира нусхасини сақлаш ёки тиклаш.</p>
+  <div class="actions">
+    <button class="green" onclick="backupData()">Захира нусхасини олиш</button>
+    <button class="secondary" onclick="document.getElementById('backupFile').click()">Нусхадан тиклаш</button>
+    <input type="file" id="backupFile" accept=".json,application/json" style="display:none" onchange="restoreData(event)">
+  </div>
+</div>
+
   <section id="dayView" class="view active">
     <div class="card">
       <h2>Кунлик иш вақти</h2>
