@@ -4,306 +4,409 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1120">
+<meta name="theme-color" content="#071426">
 <title>Иш вақтим</title>
-<link rel="stylesheet" href="style.css">
 <style>
-input {
-  width:100%; padding:13px; margin-top:8px;
-  background:#0b1120; color:white;
-  border:1px solid #344963; border-radius:10px;
-  font-size:16px;
-}
-.field { margin-bottom:15px; }
-.field label { color:#aabbd0; font-size:14px; }
-.hidden { display:none !important; }
-.action { margin:10px 0; }
-.green-button { background:linear-gradient(100deg,#087b58,#28b987); }
-.secondary { background:#25364d; margin-top:10px; }
-.result { color:#55aaff; font-size:19px; font-weight:bold; }
-.notice { color:#42d6a4; margin-top:12px; font-size:14px; }
+*{box-sizing:border-box}
+body{margin:0;background:#071426;color:#edf4ff;font-family:Arial,sans-serif}
+header{padding:22px 18px;background:#0d2039;border-bottom:1px solid #203854}
+header h1{margin:0;font-size:25px;color:#8bbcff}
+header p{margin:7px 0 0;color:#9db2ca;font-size:13px}
+main{max-width:650px;margin:auto;padding:16px}
+.card{background:#10243e;border:1px solid #25415f;border-radius:17px;padding:17px;margin-bottom:15px}
+h2{font-size:19px;margin:0 0 15px}
+h3{font-size:16px;color:#a9caff}
+input,button{width:100%;padding:13px;border-radius:10px;font-size:15px}
+input{background:#091a2e;color:white;border:1px solid #34516f;margin:6px 0 13px}
+button{border:0;background:#2676d2;color:white;font-weight:bold;margin:6px 0;cursor:pointer}
+button.secondary{background:#1b3552}
+button.green{background:#167b69}
+button:active{opacity:.8}
+label{font-size:13px;color:#b7c9df}
+.hidden{display:none!important}
+.info{color:#a8bdd5;font-size:13px}
+.stat{background:#0a1b30;border-radius:12px;padding:13px;margin:5px 0}
+.stat small{display:block;color:#9eb4ce;margin-bottom:7px}
+.stat strong{font-size:23px;color:#8bbcff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}
+nav button{margin:0}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:10px 5px;text-align:center;border-bottom:1px solid #29415d}
+th{color:#9fc5f5}
+td{color:#e0eafa}
+.scroll{overflow-x:auto}
+.month-title{font-size:23px;color:#8bbcff;margin:8px 0}
+footer{text-align:center;color:#7189a5;font-size:11px;padding:20px}
 </style>
 </head>
 <body>
-<div class="container">
 
-<header class="header">
-  <div>
-    <div class="logo">Иш вақтим</div>
-    <div class="subtitle">Шахсий иш вақти назорати</div>
-  </div>
-  <div style="font-size:28px">◷</div>
+<header>
+<h1>Иш вақтим</h1>
+<p>Шахсий иш вақти назорати</p>
 </header>
 
+<main>
+
 <section id="profileScreen" class="card hidden">
-  <h2>Ходим профили</h2>
-  <p class="subtitle" style="margin:10px 0 20px">
-    Маълумотларни киритинг
-  </p>
-  <form id="profileForm">
-    <div class="field">
-      <label>Ф.И.Ш.</label>
-      <input id="fullName" required placeholder="Фамилия, исм, шариф">
-    </div>
-    <div class="field">
-      <label>Табел рақами</label>
-      <input id="tabNumber" required placeholder="00125">
-    </div>
-    <div class="field">
-      <label>Лавозими</label>
-      <input id="position" required placeholder="Лавозимингиз">
-    </div>
-    <div class="field">
-      <label>Разряди</label>
-      <input id="grade" required placeholder="Масалан: 4-разряд">
-    </div>
-    <button type="submit">Профилни сақлаш</button>
-  </form>
+<h2>Ходим профили</h2>
+<label>Ф.И.Ш.</label>
+<input id="fullName" placeholder="Фамилия исм шариф">
+<label>Табел рақами</label>
+<input id="tabNumber" placeholder="Табел рақами">
+<label>Лавозими</label>
+<input id="position" placeholder="Лавозимингиз">
+<label>Разряди</label>
+<input id="grade" placeholder="Масалан: 4-разряд">
+<button id="saveProfile">Профилни сақлаш</button>
 </section>
 
-<main id="dashboard" class="hidden">
+<section id="dashboard" class="hidden">
 
-<section class="card">
-  <div class="card-title">ХОДИМ ПРОФИЛИ</div>
-  <h3 id="displayName"></h3>
-  <p class="subtitle" id="displayPosition"></p>
-  <p class="subtitle" id="displayTab"></p>
-  <p class="subtitle" id="displayGrade"></p>
-  <button class="secondary" onclick="editProfile()">Профилни таҳрирлаш</button>
-</section>
-
-<section class="card">
-  <div class="card-title">БУГУНГИ ИШ КУНИ</div>
-  <div class="date" id="todayDate"></div>
-  <div class="day" id="todayDay"></div>
-</section>
-
-<section class="card">
-  <div class="card-title">ИШ ВАҚТИНИ ҚАЙД ЭТИШ</div>
-
-  <div class="field">
-    <label>Сана</label>
-    <input type="date" id="workDate">
-  </div>
-
-  <button class="action" onclick="showForm('mainForm')">
-    Асосий иш вақтини ишладим
-  </button>
-
-  <button class="action green-button" onclick="showForm('extraForm')">
-    Қўшимча иш вақтини ишладим
-  </button>
-
-  <div id="mainForm" class="hidden">
-    <div class="card">
-      <h3>Асосий иш вақти</h3>
-      <div class="field">
-        <label>Иш бошланиши</label>
-        <input type="time" id="mainStart" value="08:00">
-      </div>
-      <div class="field">
-        <label>Иш тугаши</label>
-        <input type="time" id="mainEnd" value="17:00">
-      </div>
-      <p class="subtitle">12:00–13:00 тушлик вақти автоматик чиқарилади.</p>
-      <button onclick="saveMain()">Асосий ишни сақлаш</button>
-    </div>
-  </div>
-
-  <div id="extraForm" class="hidden">
-    <div class="card">
-      <h3>Қўшимча ишланган соатлар</h3>
-      <div class="field">
-        <label>Иш бошланиши</label>
-        <input type="time" id="extraStart" value="17:00">
-      </div>
-      <div class="field">
-        <label>Иш тугаши</label>
-        <input type="time" id="extraEnd" value="20:00">
-      </div>
-      <button class="green-button" onclick="saveExtra()">Қўшимча ишни сақлаш</button>
-    </div>
-  </div>
-
-  <p id="message" class="notice"></p>
-</section>
-
-<section class="card">
-  <div class="card-title">ТАНЛАНГАН КУН ҲИСОБОТИ</div>
-  <p class="subtitle">Асосий иш вақти</p>
-  <div class="result" id="mainResult">0 соат</div>
-  <p class="subtitle" style="margin-top:14px">Қўшимча ишланган соатлар</p>
-  <div class="result green" id="extraResult">0 соат</div>
-  <p class="subtitle" style="margin-top:14px">Қўшимча иш вақти (2Х)</p>
-  <div class="result green" id="doubleResult">0 соат</div>
-</section>
-
-</main>
+<div class="card">
+<h2 id="displayName"></h2>
+<p id="displayPosition" class="info"></p>
+<p id="displayTab" class="info"></p>
+<p id="displayGrade" class="info"></p>
+<button class="secondary" id="editProfile">Профилни таҳрирлаш</button>
 </div>
+
+<nav>
+<button id="dailyTab">Кунлик ҳисоб</button>
+<button id="monthlyTab">Ойлик ҳисобот</button>
+</nav>
+
+<section id="dailySection">
+
+<div class="card">
+<h2>Кунлик иш вақти</h2>
+<label>Санани танланг</label>
+<input type="date" id="workDate">
+
+<h3>Асосий иш вақти</h3>
+<label>Бошланиш вақти</label>
+<input type="time" id="mainStart" value="08:00">
+<label>Тугаш вақти</label>
+<input type="time" id="mainEnd" value="17:00">
+<button id="saveMain">Асосий иш вақтини сақлаш</button>
+
+<h3>Қўшимча иш вақти</h3>
+<label>Бошланиш вақти</label>
+<input type="time" id="extraStart" value="17:00">
+<label>Тугаш вақти</label>
+<input type="time" id="extraEnd" value="20:00">
+<button class="green" id="saveExtra">Қўшимча иш вақтини сақлаш</button>
+<p class="info">Қўшимча иш вақти 2 баробар ҳисобланади.</p>
+</div>
+
+<div class="card">
+<h2>Кунлик натижа</h2>
+<div class="grid">
+<div class="stat"><small>Асосий иш</small><strong id="mainResult">0 соат</strong></div>
+<div class="stat"><small>Қўшимча иш</small><strong id="extraResult">0 соат</strong></div>
+<div class="stat"><small>Қўшимча иш × 2</small><strong id="doubleResult">0 соат</strong></div>
+<div class="stat"><small>Жами ҳисобланган</small><strong id="dayTotal">0 соат</strong></div>
+</div>
+<button class="secondary" id="deleteDay">Шу кун маълумотларини ўчириш</button>
+</div>
+
+</section>
+
+<section id="monthlySection" class="hidden">
+
+<div class="card">
+<h2>Ойлик ҳисобот</h2>
+<label>Ҳисобот ойи</label>
+<input type="month" id="monthPicker">
+
+<h2 class="month-title" id="monthTitle"></h2>
+
+<div class="grid">
+<div class="stat"><small>Асосий иш</small><strong id="monthMain">0 соат</strong></div>
+<div class="stat"><small>Қўшимча иш</small><strong id="monthExtra">0 соат</strong></div>
+<div class="stat"><small>Қўшимча иш × 2</small><strong id="monthDouble">0 соат</strong></div>
+<div class="stat"><small>Жами ҳисобланган</small><strong id="monthTotal">0 соат</strong></div>
+</div>
+
+<div class="stat">
+<small>Ишланган кунлар</small>
+<strong id="monthDays">0 кун</strong>
+</div>
+</div>
+
+<div class="card">
+<h2>Кунлар кесимида</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th>Сана</th>
+<th>Асосий</th>
+<th>Қўшимча</th>
+<th>× 2</th>
+</tr>
+</thead>
+<tbody id="monthRows"></tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>Йиллик ҳисобот</h2>
+<label>Йилни танланг</label>
+<input type="number" id="yearPicker" min="2020" max="2100">
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th>Ой</th>
+<th>Асосий</th>
+<th>Қўшимча</th>
+<th>Жами</th>
+</tr>
+</thead>
+<tbody id="yearRows"></tbody>
+</table>
+</div>
+</div>
+
+</section>
+</section>
+</main>
+
+<footer>Иш вақтим · Шахсий иш вақти назорати</footer>
 
 <script>
 const $ = id => document.getElementById(id);
 
-const today = new Date();
-const dateKey = d =>
-  d.getFullYear() + "-" +
-  String(d.getMonth()+1).padStart(2,"0") + "-" +
-  String(d.getDate()).padStart(2,"0");
+const PROFILE_KEY = "ishVaqtimProfile";
+const RECORD_KEY = "ishVaqtimRecords";
 
-$("workDate").value = dateKey(today);
-
-const days = [
-  "Якшанба","Душанба","Сешанба",
-  "Чоршанба","Пайшанба","Жума","Шанба"
-];
-const months = [
-  "январь","февраль","март","апрель","май","июнь",
-  "июль","август","сентябрь","октябрь","ноябрь","декабрь"
-];
-
-$("todayDate").textContent =
-  today.getDate()+" "+months[today.getMonth()]+" "+today.getFullYear();
-$("todayDay").textContent = days[today.getDay()];
-
-function getProfile() {
-  return JSON.parse(localStorage.getItem("ishVaqtimProfile") || "null");
+function getProfile(){
+ try{return JSON.parse(localStorage.getItem(PROFILE_KEY)) || null}
+ catch(e){return null}
 }
 
-function showDashboard(p) {
-  $("profileScreen").classList.add("hidden");
-  $("dashboard").classList.remove("hidden");
-  $("displayName").textContent = p.fullName;
-  $("displayPosition").textContent = "Лавозими: "+p.position;
-  $("displayTab").textContent = "Табел рақами: "+p.tabNumber;
-  $("displayGrade").textContent = "Разряди: "+p.grade;
-  renderDay();
+function getRecords(){
+ try{return JSON.parse(localStorage.getItem(RECORD_KEY)) || {}}
+ catch(e){return {}}
 }
 
-function showProfile() {
-  $("profileScreen").classList.remove("hidden");
-  $("dashboard").classList.add("hidden");
+function saveRecords(data){
+ localStorage.setItem(RECORD_KEY,JSON.stringify(data));
 }
 
-$("profileForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const p = {
-    fullName:$("fullName").value.trim(),
-    tabNumber:$("tabNumber").value.trim(),
-    position:$("position").value.trim(),
-    grade:$("grade").value.trim()
-  };
-  localStorage.setItem("ishVaqtimProfile",JSON.stringify(p));
-  showDashboard(p);
-});
+function formatHours(minutes){
+ minutes=Math.round(Number(minutes)||0);
+ const h=Math.floor(minutes/60);
+ const m=minutes%60;
+ return h+" соат"+(m ? " "+m+" дақиқа":"");
+}
 
-function editProfile() {
-  const p=getProfile();
+function timeMinutes(time){
+ if(!time)return 0;
+ const p=time.split(":");
+ return Number(p[0])*60+Number(p[1]);
+}
+
+function duration(start,end,isMain){
+ const s=timeMinutes(start);
+ const e=timeMinutes(end);
+ if(e<=s)return -1;
+ let result=e-s;
+
+ if(isMain){
+  const lunchStart=12*60;
+  const lunchEnd=13*60;
+  const overlap=Math.max(0,Math.min(e,lunchEnd)-Math.max(s,lunchStart));
+  result-=overlap;
+ }
+ return result;
+}
+
+function showProfile(){
+ $("profileScreen").classList.remove("hidden");
+ $("dashboard").classList.add("hidden");
+ const p=getProfile();
+ if(p){
   $("fullName").value=p.fullName;
   $("tabNumber").value=p.tabNumber;
   $("position").value=p.position;
   $("grade").value=p.grade;
-  showProfile();
+ }
 }
 
-function showForm(id) {
-  $("mainForm").classList.add("hidden");
-  $("extraForm").classList.add("hidden");
-  $(id).classList.remove("hidden");
-  $("message").textContent="";
+function showDashboard(p){
+ $("profileScreen").classList.add("hidden");
+ $("dashboard").classList.remove("hidden");
+ $("displayName").textContent=p.fullName;
+ $("displayPosition").textContent="Лавозими: "+p.position;
+ $("displayTab").textContent="Табел рақами: "+p.tabNumber;
+ $("displayGrade").textContent="Разряди: "+p.grade;
+ renderDay();
 }
 
-function getRecords() {
-  return JSON.parse(localStorage.getItem("ishVaqtimRecords") || "{}");
+$("saveProfile").onclick=()=>{
+ const p={
+  fullName:$("fullName").value.trim(),
+  tabNumber:$("tabNumber").value.trim(),
+  position:$("position").value.trim(),
+  grade:$("grade").value.trim()
+ };
+ if(!p.fullName){alert("Ф.И.Ш.ни киритинг");return}
+ localStorage.setItem(PROFILE_KEY,JSON.stringify(p));
+ showDashboard(p);
+};
+
+$("editProfile").onclick=showProfile;
+
+function renderDay(){
+ const date=$("workDate").value;
+ const r=getRecords()[date] || {};
+
+ $("mainStart").value=r.main?.start || "08:00";
+ $("mainEnd").value=r.main?.end || "17:00";
+ $("extraStart").value=r.extra?.start || "17:00";
+ $("extraEnd").value=r.extra?.end || "20:00";
+
+ const main=r.main?.total || 0;
+ const extra=r.extra?.total || 0;
+
+ $("mainResult").textContent=formatHours(main);
+ $("extraResult").textContent=formatHours(extra);
+ $("doubleResult").textContent=formatHours(extra*2);
+ $("dayTotal").textContent=formatHours(main+extra*2);
 }
 
-function minutes(t) {
-  const [h,m]=t.split(":").map(Number);
-  return h*60+m;
+function saveWork(type){
+ const start=$(type+"Start").value;
+ const end=$(type+"End").value;
+ const total=duration(start,end,type==="main");
+
+ if(total<=0){
+  alert("Тугаш вақти бошланиш вақтидан кейин бўлиши керак");
+  return;
+ }
+
+ const data=getRecords();
+ const date=$("workDate").value;
+ if(!date){alert("Санани танланг");return}
+
+ if(!data[date])data[date]={};
+ data[date][type]={start,end,total};
+ saveRecords(data);
+ renderDay();
+ alert("Маълумот сақланди!");
 }
 
-function duration(start,end) {
-  const a=minutes(start);
-  const b=minutes(end);
-  return b>a ? b-a : -1;
-}
+$("saveMain").onclick=()=>saveWork("main");
+$("saveExtra").onclick=()=>saveWork("extra");
+$("workDate").onchange=renderDay;
 
-function formatHours(min) {
-  const h=Math.floor(min/60);
-  const m=min%60;
-  return h+" соат "+m+" дақиқа";
-}
-
-function saveMain() {
-  const start=$("mainStart").value;
-  const end=$("mainEnd").value;
-  if(!start || !end) return alert("Иш вақтини киритинг.");
-
-  let total=duration(start,end);
-  if(total<=0) return alert("Тугаш вақти бошланишидан кейин бўлиши керак.");
-
-  // 12:00–13:00 тушлик билан устма-уст тушган вақтни чиқариш
-  const lunchOverlap=Math.max(0,
-    Math.min(minutes(end),780)-Math.max(minutes(start),720)
-  );
-  total-=lunchOverlap;
-
-  const date=$("workDate").value;
-  if(!date) return alert("Санани танланг.");
-
-  const records=getRecords();
-  records[date]=records[date] || {};
-  records[date].main={start,end,total};
-  localStorage.setItem("ishVaqtimRecords",JSON.stringify(records));
-
-  $("message").textContent="Асосий иш вақти сақланди!";
-  $("mainForm").classList.add("hidden");
+$("deleteDay").onclick=()=>{
+ const date=$("workDate").value;
+ const data=getRecords();
+ if(!data[date])return;
+ if(confirm("Шу куннинг барча маълумотлари ўчирилсинми?")){
+  delete data[date];
+  saveRecords(data);
   renderDay();
+ }
+};
+
+function showDaily(){
+ $("dailySection").classList.remove("hidden");
+ $("monthlySection").classList.add("hidden");
 }
 
-function saveExtra() {
-  const start=$("extraStart").value;
-  const end=$("extraEnd").value;
-  if(!start || !end) return alert("Қўшимча иш вақтини киритинг.");
-
-  const total=duration(start,end);
-  if(total<=0) return alert("Тугаш вақти бошланишидан кейин бўлиши керак.");
-
-  const date=$("workDate").value;
-  if(!date) return alert("Санани танланг.");
-
-  const records=getRecords();
-  records[date]=records[date] || {};
-  records[date].extra={start,end,total};
-  localStorage.setItem("ishVaqtimRecords",JSON.stringify(records));
-
-  $("message").textContent="Қўшимча иш вақти сақланди!";
-  $("extraForm").classList.add("hidden");
-  renderDay();
+function showMonthly(){
+ $("dailySection").classList.add("hidden");
+ $("monthlySection").classList.remove("hidden");
+ renderMonthly();
 }
 
-function renderDay() {
-  const r=getRecords()[$("workDate").value] || {};
-  const main=r.main ? r.main.total : 0;
-  const extra=r.extra ? r.extra.total : 0;
+$("dailyTab").onclick=showDaily;
+$("monthlyTab").onclick=showMonthly;
 
-  $("mainResult").textContent=formatHours(main);
-  $("extraResult").textContent=formatHours(extra);
-  $("doubleResult").textContent=formatHours(extra*2);
+const months=[
+"Январь","Февраль","Март","Апрель","Май","Июнь",
+"Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"
+];
 
-  if(r.main) {
-    $("mainStart").value=r.main.start;
-    $("mainEnd").value=r.main.end;
-  }
-  if(r.extra) {
-    $("extraStart").value=r.extra.start;
-    $("extraEnd").value=r.extra.end;
-  }
+function renderMonthly(){
+ const value=$("monthPicker").value;
+ if(!value)return;
+
+ const [year,month]=value.split("-").map(Number);
+ const prefix=year+"-"+String(month).padStart(2,"0");
+ const records=getRecords();
+
+ let main=0,extra=0,days=0;
+ let rows="";
+
+ Object.keys(records).sort().forEach(date=>{
+  if(!date.startsWith(prefix))return;
+  const r=records[date];
+  const m=r.main?.total || 0;
+  const x=r.extra?.total || 0;
+  if(m>0 || x>0)days++;
+  main+=m;
+  extra+=x;
+
+  rows+="<tr><td>"+date.slice(8,10)+"</td>"+
+  "<td>"+formatHours(m)+"</td>"+
+  "<td>"+formatHours(x)+"</td>"+
+  "<td>"+formatHours(x*2)+"</td></tr>";
+ });
+
+ $("monthTitle").textContent=months[month-1]+" "+year;
+ $("monthMain").textContent=formatHours(main);
+ $("monthExtra").textContent=formatHours(extra);
+ $("monthDouble").textContent=formatHours(extra*2);
+ $("monthTotal").textContent=formatHours(main+extra*2);
+ $("monthDays").textContent=days+" кун";
+ $("monthRows").innerHTML=rows || '<tr><td colspan="4">Ҳозирча маълумот йўқ</td></tr>';
+
+ renderYear();
 }
 
-$("workDate").addEventListener("change",renderDay);
+function renderYear(){
+ const year=Number($("yearPicker").value);
+ const records=getRecords();
+ let rows="";
+
+ months.forEach((name,index)=>{
+  const prefix=year+"-"+String(index+1).padStart(2,"0");
+  let main=0,extra=0;
+
+  Object.keys(records).forEach(date=>{
+   if(!date.startsWith(prefix))return;
+   const r=records[date];
+   main+=r.main?.total || 0;
+   extra+=r.extra?.total || 0;
+  });
+
+  rows+="<tr><td>"+name+"</td>"+
+  "<td>"+formatHours(main)+"</td>"+
+  "<td>"+formatHours(extra)+"</td>"+
+  "<td>"+formatHours(main+extra*2)+"</td></tr>";
+ });
+
+ $("yearRows").innerHTML=rows;
+}
+
+$("monthPicker").onchange=renderMonthly;
+$("yearPicker").onchange=renderYear;
+
+const today=new Date();
+const dateText=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+$("workDate").value=dateText;
+$("monthPicker").value=dateText.slice(0,7);
+$("yearPicker").value=today.getFullYear();
 
 const profile=getProfile();
-if(profile) showDashboard(profile);
+if(profile)showDashboard(profile);
 else showProfile();
 </script>
 </body>
